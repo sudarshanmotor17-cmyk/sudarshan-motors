@@ -436,16 +436,17 @@ function signInWithGoogle() {
     // No client ID configured — show instruction
     showConfigNotice(); return;
   }
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-    callback: (resp) => {
-      if (resp.error) { toast('❌ Sign-in failed: ' + resp.error, 'er'); return; }
-      accessToken = resp.access_token;
-      fetchUserInfo();
-    }
-  });
-  client.requestAccessToken();
+ const client = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+      ux_mode: 'popup',
+      callback: (resp) => {
+        if (resp.error) { toast('❌ Sign-in failed: ' + resp.error, 'er'); return; }
+        accessToken = resp.access_token;
+        fetchUserInfo();
+      }
+    });
+    client.requestAccessToken({prompt: 'consent'});
 }
 
 async function fetchUserInfo() {
