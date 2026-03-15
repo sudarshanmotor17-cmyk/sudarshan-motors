@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0c0c14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Sudarshan Motors</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ───────────────────────────────────────────── */
+:root{
+  --bg:    #0c0c14; --bg1: #12121c; --bg2: #181824;
+  --bg3:   #1e1e2e; --bg4: #252535;
+  --acc:   #f97316; --acc2: #fb923c;
+  --adim:  rgba(249,115,22,.13); --aglow: rgba(249,115,22,.32);
+  --grn:   #22c55e; --red: #ef4444; --ylw: #f59e0b; --blu: #60a5fa;
+  --t1:    #f1f5f9; --t2: #94a3b8; --t3: #475569;
+  --bdr:   rgba(255,255,255,.07); --bacc: rgba(249,115,22,.2);
+  --r:14px; --rs:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--t1);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── UTILS ────────────────────────────────────────────── */
+.hide{display:none!important}
+.rai{font-family:'Rajdhani',sans-serif}
+.spin{animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{transform:translateY(70px);opacity:0}to{transform:none;opacity:1}}
+@keyframes pls{0%,100%{box-shadow:0 0 40px var(--aglow)}50%{box-shadow:0 0 70px rgba(249,115,22,.8)}}
+
+/* ── FULL-PAGE SCREENS ────────────────────────────────── */
+.screen{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
+
+/* LOGIN */
+#s-login{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(249,115,22,.12) 0%,transparent 70%),var(--bg)}
+.login-logo{width:90px;height:90px;border-radius:28px;background:linear-gradient(145deg,#fb923c,#c2410c);display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:0 0 50px var(--aglow),0 20px 60px rgba(0,0,0,.5);animation:pls 2.5s ease-in-out infinite;margin-bottom:20px}
+.login-brand{font-size:26px;font-weight:700;color:var(--acc);letter-spacing:1.5px;margin-bottom:4px}
+.login-tagline{font-size:13px;color:var(--t2);margin-bottom:36px;text-align:center;line-height:1.5}
+.login-card{width:100%;max-width:360px;background:var(--bg2);border:1px solid var(--bacc);border-radius:20px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-card h2{font-size:13px;font-weight:600;color:var(--t2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:18px;text-align:center}
+.google-btn{width:100%;padding:14px;background:#fff;border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-size:15px;font-weight:600;color:#1f2937;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:.2s;font-family:'DM Sans',sans-serif}
+.google-btn:active{transform:scale(.97)}
+.google-btn svg{flex-shrink:0}
+.login-note{font-size:11px;color:var(--t3);text-align:center;margin-top:14px;line-height:1.6}
+.login-divider{display:flex;align-items:center;gap:10px;margin:16px 0}
+.login-divider span{font-size:11px;color:var(--t3)}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.demo-btn{width:100%;padding:12px;background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;transition:.2s}
+.demo-btn:active{background:var(--bg4)}
+
+/* SPLASH / LOADING */
+#s-splash{gap:16px}
+.splash-ring{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fb923c,#c2410c);display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 40px var(--aglow);animation:pls 2s infinite}
+.splash-title{font-size:20px;font-weight:700;color:var(--acc);letter-spacing:1px}
+.splash-sub{font-size:12px;color:var(--t2)}
+.splash-bar{width:160px;height:3px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:6px}
+.splash-fill{height:100%;background:var(--acc);border-radius:3px;width:0%;transition:width .4s ease}
+
+/* ── APP SHELL ────────────────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto}
+
+/* HEADER */
+.hdr{background:linear-gradient(160deg,var(--bg1),var(--bg2));border-bottom:1px solid var(--bdr);padding:11px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:relative}
+.hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),transparent)}
+.hdr-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(145deg,#fb923c,#c2410c);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 0 12px var(--aglow)}
+.hdr-text h1{font-size:16px;font-weight:700;color:var(--acc);line-height:1}
+.hdr-text p{font-size:10px;color:var(--t2);margin-top:1px}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.user-pill{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--bdr);border-radius:30px;padding:4px 10px 4px 4px;cursor:pointer}
+.user-av{width:24px;height:24px;border-radius:50%;object-fit:cover}
+.user-av-fb{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--acc),#c2410c);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.user-name{font-size:11px;font-weight:500;color:var(--t1);max-width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync-btn{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:5px 9px;font-size:11px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;transition:.2s}
+.sync-btn:active{transform:scale(.93)}
+.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sdot.live{background:var(--grn)} .sdot.off{background:var(--red)} .sdot.loading{background:var(--ylw);animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* PAGES */
+.pages{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.pg{display:none;padding:14px;animation:fadeUp .22s ease}
+.pg.active{display:block}
+
+/* BOTTOM NAV */
+.bnav{background:var(--bg1);border-top:1px solid var(--bdr);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 4px 7px;cursor:pointer;border:none;background:none;color:var(--t2);font-size:10px;font-family:'DM Sans',sans-serif;transition:.2s;position:relative}
+.nb .ni{font-size:20px;transition:transform .2s}
+.nb.active{color:var(--acc)} .nb.active .ni{transform:scale(1.18)}
+.nbadge{position:absolute;top:5px;right:calc(50% - 17px);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center}
+
+/* DASHBOARD */
+.hero{background:linear-gradient(135deg,var(--bg2),var(--bg1));border:1px solid var(--bacc);border-radius:var(--r);padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.hero::before{content:'🛢️';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:52px;opacity:.1}
+.hero-lbl{font-size:11px;color:var(--t2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px}
+.hero-date{font-size:18px;font-weight:700}
+.hero-sub{font-size:11px;color:var(--acc);margin-top:6px;display:flex;align-items:center;gap:5px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sc{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:11px 8px;text-align:center}
+.sn{font-size:24px;font-weight:700;line-height:1} .sl{font-size:10px;color:var(--t2);margin-top:3px;line-height:1.2}
+.sc.o .sn{color:var(--acc)} .sc.r .sn{color:var(--red)} .sc.g .sn{color:var(--grn)}
+.sec{font-size:12px;font-weight:700;color:var(--t2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sec .ln{flex:1;height:1px;background:var(--bdr)}
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.ab{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:16px 13px;cursor:pointer;display:flex;flex-direction:column;gap:7px;transition:.18s}
+.ab:active{transform:scale(.97)} .ab.pri{border-color:var(--bacc);background:var(--adim);box-shadow:0 0 16px rgba(249,115,22,.08)}
+.ab .ai{font-size:26px} .ab .al{font-size:14px;font-weight:700;line-height:1.2} .ab .as{font-size:11px;color:var(--t2)}
+
+/* REMINDER CARDS */
+.rc{background:var(--bg2);border-radius:var(--rs);border-left:3px solid var(--ylw);padding:11px;margin-bottom:8px;display:flex;align-items:flex-start;gap:9px;cursor:pointer;transition:transform .15s}
+.rc:active{transform:scale(.98)} .rc.urg{border-left-color:var(--red)} .rc.sent{border-left-color:var(--grn);opacity:.65}
+.ava{border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;flex-shrink:0}
+.wab{background:#25D366;border:none;color:#fff;border-radius:7px;padding:7px 9px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;transition:transform .15s}
+.wab:active{transform:scale(.87)}
+
+/* FORM */
+.fcard{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.ftitle{font-size:17px;font-weight:700;color:var(--acc);margin-bottom:15px;display:flex;align-items:center;gap:8px}
+.fld{margin-bottom:11px}
+.fld label{display:block;font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
+.fld input,.fld select{width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--rs);padding:10px 12px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:.2s;-webkit-appearance:none;appearance:none}
+.fld input:focus,.fld select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(249,115,22,.1)}
+.fld input::placeholder{color:var(--t3)} .fld select option{background:var(--bg3)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sbtn{width:100%;padding:14px;background:linear-gradient(135deg,#f97316,#ea580c);border:none;border-radius:var(--rs);color:#fff;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 18px rgba(249,115,22,.38);transition:.2s}
+.sbtn:active{transform:scale(.98)} .sbtn:disabled{opacity:.5;cursor:not-allowed}
+
+/* SEARCH + LIST */
+.sbar{position:relative;margin-bottom:11px}
+.sbar input{width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:40px;padding:10px 13px 10px 40px;color:var(--t1);font-size:13px;outline:none;transition:.2s;font-family:'DM Sans',sans-serif}
+.sbar input:focus{border-color:var(--acc)} .sbar .si{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.sbar input::placeholder{color:var(--t3)}
+.cc{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:.15s}
+.cc:active{transform:scale(.98)} .cc.ov{border-left:3px solid var(--red)} .cc.ds{border-left:3px solid var(--ylw)} .cc.ok{border-left:3px solid var(--grn)}
+.tag{font-size:10px;font-weight:700;font-family:'Rajdhani',sans-serif;padding:3px 7px;border-radius:20px;letter-spacing:.4px}
+.tr{background:rgba(239,68,68,.12);color:var(--red)} .ty{background:rgba(245,158,11,.12);color:var(--ylw)} .tg{background:rgba(34,197,94,.12);color:var(--grn)}
+
+/* FILTER CHIPS */
+.rfc{display:flex;gap:7px;margin-bottom:11px;overflow-x:auto;padding-bottom:3px}
+.rfc::-webkit-scrollbar{display:none}
+.fc{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;font-family:'Rajdhani',sans-serif;letter-spacing:.4px;cursor:pointer;border:1px solid var(--bdr);background:var(--bg2);color:var(--t2);transition:.18s}
+.fc.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+
+/* MODAL */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(6px)}
+.moverlay.open{display:flex}
+.modal{background:var(--bg1);border-radius:22px 22px 0 0;width:100%;max-width:480px;margin:0 auto;padding:16px;max-height:88vh;overflow-y:auto;animation:slideUp .28s ease}
+.mhandle{width:36px;height:4px;background:#334155;border-radius:2px;margin:0 auto 13px}
+.mhdr{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.mf{background:var(--bg3);border-radius:var(--rs);padding:10px}
+.mf .ml{font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.7px;text-transform:uppercase;margin-bottom:3px}
+.mf .mv{font-size:14px;font-weight:700}
+.macts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.macts button{padding:12px;border-radius:var(--rs);border:none;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.macts button:active{transform:scale(.97)}
+.bwa{background:#25D366;color:#fff} .bed{background:var(--adim);color:var(--acc);border:1px solid var(--bacc)!important}
+.bdl{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.22)!important}
+.bcl{background:var(--bg3);color:var(--t2)}
+
+/* TOAST */
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-14px);background:var(--bg2);border:1px solid var(--bdr);border-radius:30px;padding:8px 16px;font-size:12px;font-weight:500;opacity:0;transition:.26s;z-index:400;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:rgba(34,197,94,.35);color:var(--grn)} .toast.er{border-color:rgba(239,68,68,.35);color:var(--red)}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 16px}
+.empty .ei{font-size:48px;margin-bottom:9px}
+.empty h3{font-size:16px;color:var(--t2)} .empty p{font-size:12px;color:var(--t3);margin-top:4px}
+
+/* SETTINGS ROW */
+.srow{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:13px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.srow .sri{font-size:20px;width:34px;text-align:center}
+.srow .srt{font-weight:600;font-size:13px} .srow .srs{font-size:11px;color:var(--t2);margin-top:2px}
+.ibox{background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.18);border-radius:var(--rs);padding:11px 13px;font-size:12px;color:#93c5fd;line-height:1.6;margin-bottom:11px}
+.exbtn{width:100%;padding:13px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--t1);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;transition:.18s}
+.exbtn:active{background:var(--bg3)} .exbtn.gn{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.22);color:var(--grn)}
+
+/* LOADER */
+.loverlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;backdrop-filter:blur(3px)}
+.loverlay.show{display:flex}
+.lspinner{width:36px;height:36px;border:3px solid var(--bg3);border-top-color:var(--acc);border-radius:50%;animation:rot .8s linear infinite}
+.loverlay p{font-size:13px;color:var(--t2)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+
+/* ONE-TIME CONFIG NOTICE */
+.config-notice{background:rgba(249,115,22,.08);border:1px solid var(--bacc);border-radius:var(--rs);padding:12px;margin-bottom:12px;font-size:12px;color:var(--acc);line-height:1.6}
+.config-notice b{font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ─────────────────────────────────────────────── -->
+<div class="screen" id="s-login">
+  <div class="login-logo">🛢️</div>
+  <div class="login-brand rai">SUDARSHAN MOTORS</div>
+  <div class="login-tagline">Oil Change Reminder System<br>Gandhinagar Main Road · 7978752806</div>
+  <div class="login-card">
+    <h2>Sign in to continue</h2>
+    <button class="google-btn" onclick="signInWithGoogle()">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="login-divider"><span>or</span></div>
+    <button class="demo-btn" onclick="startDemo()">▶ Try Demo Mode (no login needed)</button>
+    <div class="login-note">
+      Your data saves to <b>Google Sheets</b> automatically.<br>
+      All employees sign in with their Google account.
+    </div>
+  </div>
+</div>
+
+<!-- ── SPLASH ─────────────────────────────────────────────── -->
+<div class="screen hide" id="s-splash">
+  <div class="splash-ring">🛢️</div>
+  <div class="splash-title rai">SUDARSHAN MOTORS</div>
+  <div class="splash-sub" id="splash-msg">Signing in...</div>
+  <div class="splash-bar"><div class="splash-fill" id="splash-fill"></div></div>
+</div>
+
+<!-- ── FIRST RUN: Sheet ID entry (shown once to owner) ──── -->
+<div class="screen hide" id="s-sheetid">
+  <div style="width:100%;max-width:380px">
+    <div style="font-size:40px;text-align:center;margin-bottom:12px">📋</div>
+    <div class="rai" style="font-size:20px;font-weight:700;color:var(--acc);text-align:center;margin-bottom:6px">One-Time Setup</div>
+    <div style="font-size:13px;color:var(--t2);text-align:center;margin-bottom:24px;line-height:1.5">Connect to your Google Sheet.<br>This is done only once by the owner.</div>
+    <div style="background:var(--bg2);border:1px solid var(--bacc);border-radius:var(--r);padding:20px">
+      <div style="font-size:12px;color:var(--t2);background:var(--bg3);border-radius:var(--rs);padding:12px;margin-bottom:16px;line-height:1.7">
+        <b style="color:var(--t1)">Steps:</b><br>
+        1. Open <b style="color:var(--acc)">Google Sheets</b> (sheets.google.com)<br>
+        2. Create a new sheet named <b style="color:var(--acc)">"Sudarshan Motors Customers"</b><br>
+        3. Copy the <b style="color:var(--acc)">Sheet ID</b> from the URL:<br>
+        <span style="font-size:11px;color:var(--t3)">docs.google.com/spreadsheets/d/<b style="color:var(--ylw)">THIS-PART</b>/edit</span><br>
+        4. Paste it below and tap Save
+      </div>
+      <div class="fld">
+        <label>Google Sheet ID</label>
+        <input type="text" id="sheet-id-input" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" style="font-size:12px">
+      </div>
+      <button class="sbtn" onclick="saveSheetId()" style="margin-top:4px">💾 Save & Open App</button>
+      <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px">Employees don't need to do this — only the owner does it once.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP ─────────────────────────────────────────────────── -->
+<div id="app" class="hide">
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-logo">🛢️</div>
+    <div class="hdr-text">
+      <h1 class="rai">SUDARSHAN MOTORS</h1>
+      <p>Gandhinagar · 7978752806</p>
+    </div>
+    <div class="hdr-right">
+      <div class="sync-btn" onclick="syncNow()" id="sync-btn">
+        <div class="sdot loading" id="sdot"></div>
+        <span id="slbl">Sync</span>
+      </div>
+      <div class="user-pill" onclick="showUserMenu()">
+        <img id="user-av-img" class="user-av hide" src="" alt="">
+        <div id="user-av-fb" class="user-av-fb">?</div>
+        <span class="user-name" id="user-name-lbl">...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pages -->
+  <div class="pages">
+
+    <!-- HOME -->
+    <div class="pg active" id="pg-home">
+      <div class="hero">
+        <div class="hero-lbl rai">Welcome</div>
+        <div class="hero-date rai" id="h-date"></div>
+        <div class="hero-sub" id="h-emp">📍 Sudarshan Motors</div>
+      </div>
+      <div class="stats">
+        <div class="sc o"><div class="sn rai" id="s-t">0</div><div class="sl">Total</div></div>
+        <div class="sc r"><div class="sn rai" id="s-o">0</div><div class="sl">Overdue</div></div>
+        <div class="sc g"><div class="sn rai" id="s-s">0</div><div class="sl">Due 7d</div></div>
+      </div>
+      <div class="sec rai">Quick Actions <span class="ln"></span></div>
+      <div class="ag">
+        <div class="ab pri" onclick="nav('add')"><div class="ai">➕</div><div><div class="al rai">Add Customer</div><div class="as">New oil change</div></div></div>
+        <div class="ab" onclick="nav('customers')"><div class="ai">👥</div><div><div class="al rai">All Customers</div><div class="as">View & search</div></div></div>
+        <div class="ab" onclick="nav('reminders')"><div class="ai">🔔</div><div><div class="al rai">Reminders</div><div class="as">Overdue & soon</div></div></div>
+        <div class="ab" onclick="syncNow()"><div class="ai">🔄</div><div><div class="al rai">Sync Sheet</div><div class="as">Refresh data</div></div></div>
+      </div>
+      <div class="sec rai">Upcoming Reminders <span class="ln"></span></div>
+      <div id="home-rem"></div>
+    </div>
+
+    <!-- ADD -->
+    <div class="pg" id="pg-add">
+      <div class="fcard">
+        <div class="ftitle rai">🔧 <span id="ftitle">Add New Customer</span></div>
+        <input type="hidden" id="eid">
+        <div class="fld"><label>Customer Name *</label><input type="text" id="f-nm" placeholder="e.g. Ramesh Kumar" autocomplete="off"></div>
+        <div class="fld"><label>Mobile Number *</label><input type="tel" id="f-ph" placeholder="10-digit number" maxlength="15"></div>
+        <div class="fr">
+          <div class="fld"><label>Mobile Model</label><input type="text" id="f-mm" placeholder="Samsung M32"></div>
+          <div class="fld"><label>Bike Model *</label><input type="text" id="f-bk" placeholder="Honda Shine"></div>
+        </div>
+        <div class="fr">
+          <div class="fld"><label>Oil Change Date *</label><input type="date" id="f-dt"></div>
+          <div class="fld"><label>Running KM *</label><input type="number" id="f-km" placeholder="15200"></div>
+        </div>
+        <div class="fr">
+          <div class="fld"><label>Bike Number</label><input type="text" id="f-bn" placeholder="OD 05 AB 1234"></div>
+          <div class="fld"><label>Oil Brand</label><input type="text" id="f-ol" placeholder="Castrol, Motul"></div>
+        </div>
+        <button class="sbtn" id="savebtn" onclick="saveCust()">
+          <span>💾</span><span id="savetxt">Save to Google Sheet</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="pg" id="pg-customers">
+      <div class="sbar"><span class="si">🔍</span><input type="text" id="search" placeholder="Search name, phone, bike..." oninput="renderList()"></div>
+      <div id="clist"></div>
+    </div>
+
+    <!-- REMINDERS -->
+    <div class="pg" id="pg-reminders">
+      <div class="rfc">
+        <div class="fc active" onclick="setF(this,'all')">All</div>
+        <div class="fc" onclick="setF(this,'today')">Today</div>
+        <div class="fc" onclick="setF(this,'week')">This Week</div>
+        <div class="fc" onclick="setF(this,'overdue')">Overdue</div>
+        <div class="fc" onclick="setF(this,'sent')">Sent</div>
+      </div>
+      <div id="rlist"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="pg" id="pg-settings">
+      <div class="ibox">📊 Data is stored in <b>Google Sheets</b>. All employees share the same sheet in real time.</div>
+      <div class="sec rai">Export <span class="ln"></span></div>
+      <button class="exbtn gn" onclick="exportCSV()">📊 Export to CSV / Excel</button>
+      <button class="exbtn" onclick="openGSheet()">📋 Open Google Sheet</button>
+      <div class="sec rai" style="margin-top:16px">Account <span class="ln"></span></div>
+      <div class="srow" id="set-user-row">
+        <div class="sri">👤</div>
+        <div><div class="srt" id="set-uname">—</div><div class="srs" id="set-uemail">—</div></div>
+      </div>
+      <div class="srow" style="cursor:pointer" onclick="showSheetIdScreen()">
+        <div class="sri">📋</div>
+        <div><div class="srt">Google Sheet ID</div><div class="srs" id="set-sid" style="word-break:break-all;max-width:260px;font-size:10px">Tap to change</div></div>
+      </div>
+      <div class="srow" style="cursor:pointer" onclick="signOut()">
+        <div class="sri">🚪</div>
+        <div><div class="srt" style="color:var(--red)">Sign Out</div><div class="srs">Return to login screen</div></div>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- Bottom Nav -->
+  <div class="bnav">
+    <button class="nb active" data-p="home" onclick="nav('home')"><span class="ni">🏠</span>Home</button>
+    <button class="nb" data-p="add" onclick="nav('add')"><span class="ni">➕</span>Add</button>
+    <button class="nb" data-p="customers" onclick="nav('customers')"><span class="ni">👥</span>Customers</button>
+    <button class="nb" data-p="reminders" onclick="nav('reminders')">
+      <span class="ni">🔔</span>Reminders
+      <span class="nbadge hide" id="rbadge"></span>
+    </button>
+    <button class="nb" data-p="settings" onclick="nav('settings')"><span class="ni">⚙️</span>Settings</button>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="moverlay" id="dmodal" onclick="cmOut(event)">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhdr">
+      <div class="ava" id="m-av" style="width:50px;height:50px;font-size:20px"></div>
+      <div><div class="rai" style="font-size:20px;font-weight:700" id="m-nm"></div><div style="font-size:12px;color:var(--t2)" id="m-info"></div></div>
+    </div>
+    <div class="mgrid" id="m-grid"></div>
+    <div class="macts">
+      <button class="bwa" onclick="sendWA()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </button>
+      <button class="bed rai" onclick="editC()">✏️ Edit</button>
+      <button class="bdl rai" onclick="delC()">🗑️ Delete</button>
+      <button class="bcl rai" onclick="cm()">✕ Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loader overlay -->
+<div class="loverlay" id="loader">
+  <div class="lspinner"></div>
+  <p id="lmsg">Loading...</p>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  CONFIGURATION — replace CLIENT_ID with yours
+//  Get it free at: console.cloud.google.com
+//  (Create project → Enable Sheets API → OAuth 2.0 Client ID)
+// ══════════════════════════════════════════════════════════
+const CLIENT_ID = '687936364206-6idri2cbljl9oqj9j2h41rn4ngnminq0.apps.googleusercontent.com.apps.googleusercontent.com';
+// Sheet name tab inside Google Sheets
+const SHEET_TAB = 'Customers';
+const HEADERS   = ['ID','Name','Phone','Mobile Model','Bike Model','Bike Number',
+                   'Oil Change Date','Running KM','Oil Brand','Reminder Date',
+                   'Reminder Sent','Last Sent','Added By','Created At'];
+
+// ── STATE ─────────────────────────────────────────────────
+let accessToken = '';
+let userInfo    = {};
+let sheetId     = '';
+let customers   = [];
+let selId       = null;
+let remF        = 'all';
+let isDemoMode  = false;
+
+// ── GOOGLE AUTH ───────────────────────────────────────────
+function signInWithGoogle() {
+  if (CLIENT_ID === '687936364206-6idri2cbljl9oqj9j2h41rn4ngnminq0.apps.googleusercontent.com.apps.googleusercontent.com') {
+    // No client ID configured — show instruction
+    showConfigNotice(); return;
+  }
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+    callback: (resp) => {
+      if (resp.error) { toast('❌ Sign-in failed: ' + resp.error, 'er'); return; }
+      accessToken = resp.access_token;
+      fetchUserInfo();
+    }
+  });
+  client.requestAccessToken();
+}
+
+async function fetchUserInfo() {
+  showSplash('Getting your account info...');
+  try {
+    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    });
+    userInfo = await r.json();
+    localStorage.setItem('sm_user', JSON.stringify({ name: userInfo.name, email: userInfo.email, picture: userInfo.picture }));
+    postLogin();
+  } catch(e) { toast('❌ Could not fetch user info','er'); hideSplash(); }
+}
+
+function postLogin() {
+  sheetId = localStorage.getItem('sm_sheet_id') || '';
+  updateSplash('Connecting to Google Sheet...', 60);
+  if (!sheetId) {
+    hideSplash();
+    showScreen('s-sheetid'); return;
+  }
+  loadApp();
+}
+
+function saveSheetId() {
+  const v = document.getElementById('sheet-id-input').value.trim();
+  if (!v) { toast('⚠️ Please enter the Sheet ID','er'); return; }
+  localStorage.setItem('sm_sheet_id', v);
+  sheetId = v;
+  showSplash('Setting up your sheet...');
+  ensureSheetHeaders().then(() => loadApp());
+}
+
+function showSheetIdScreen() {
+  cm();
+  showScreen('s-sheetid');
+  document.getElementById('sheet-id-input').value = sheetId;
+}
+
+// ── DEMO MODE ─────────────────────────────────────────────
+function startDemo() {
+  isDemoMode = true;
+  userInfo = { name: 'Demo Employee', email: 'demo@sudarshanmotors.com', picture: '' };
+  customers = getDemoData();
+  loadApp();
+}
+
+function getDemoData() {
+  const n=new Date(), gs=d=>d.toISOString().split('T')[0];
+  const d1=new Date(n); d1.setMonth(d1.getMonth()-3); d1.setDate(d1.getDate()-4);
+  const d2=new Date(n); d2.setMonth(d2.getMonth()-3); d2.setDate(d2.getDate()+5);
+  const d3=new Date(n); d3.setMonth(d3.getMonth()-1);
+  return [
+    {id:'D1',name:'Ramesh Kumar',phone:'9876543210',mobileModel:'Samsung M32',bike:'Honda Shine',bikeNum:'OD05AB1234',oilDate:gs(d1),km:15200,oil:'Castrol',reminderDate:remOf(gs(d1)),reminderSent:false,addedBy:'Raju'},
+    {id:'D2',name:'Suresh Patra',phone:'8765432109',mobileModel:'',bike:'Hero Splendor',bikeNum:'OD02CD5678',oilDate:gs(d2),km:22400,oil:'Motul',reminderDate:remOf(gs(d2)),reminderSent:false,addedBy:'Owner'},
+    {id:'D3',name:'Priya Nayak',phone:'7654321098',mobileModel:'iPhone 12',bike:'TVS Jupiter',bikeNum:'OD07EF9012',oilDate:gs(d3),km:8900,oil:'Shell',reminderDate:remOf(gs(d3)),reminderSent:false,addedBy:'Suresh'},
+  ];
+}
+
+// ── SHEET API ─────────────────────────────────────────────
+const SHEETS = (path, method='GET', body) => fetch(
+  `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}${path}`,
+  { method, headers: { Authorization:'Bearer '+accessToken, 'Content-Type':'application/json' }, body: body ? JSON.stringify(body) : undefined }
+).then(r => r.json());
+
+async function ensureSheetHeaders() {
+  try {
+    const r = await SHEETS(`/values/${SHEET_TAB}!A1:Z1`);
+    if (!r.values || !r.values[0] || r.values[0].length < 5) {
+      await SHEETS(`/values/${SHEET_TAB}!A1:Z1:clear`, 'POST');
+      await SHEETS(`/values/${SHEET_TAB}!A1`, 'PUT', { values: [HEADERS], valueInputOption: 'RAW' });
+    }
+  } catch(e) { /* sheet tab might not exist */ }
+}
+
+async function fetchFromSheet() {
+  if (isDemoMode) return;
+  setSyncState('loading');
+  try {
+    const r = await SHEETS(`/values/${SHEET_TAB}!A:Z`);
+    if (!r.values || r.values.length < 2) { customers = []; setSyncState('live'); return; }
+    customers = r.values.slice(1).map(rowToObj).filter(c => c.id);
+    setSyncState('live');
+  } catch(e) {
+    setSyncState('offline'); toast('❌ Could not load sheet data','er');
+  }
+}
+
+async function appendToSheet(c) {
+  if (isDemoMode) { customers.unshift(c); return true; }
+  try {
+    await SHEETS(`/values/${SHEET_TAB}!A:Z:append`, 'POST', {
+      values: [objToRow(c)], valueInputOption: 'USER_ENTERED', insertDataOption: 'INSERT_ROWS'
+    });
+    customers.unshift(c);
+    return true;
+  } catch(e) { return false; }
+}
+
+async function updateInSheet(c) {
+  if (isDemoMode) { const i=customers.findIndex(x=>x.id===c.id); if(i>-1) customers[i]=c; return true; }
+  try {
+    const r = await SHEETS(`/values/${SHEET_TAB}!A:A`);
+    if (!r.values) return false;
+    const row = r.values.findIndex(v => v[0] === c.id);
+    if (row < 0) return false;
+    await SHEETS(`/values/${SHEET_TAB}!A${row+1}`, 'PUT', {
+      values: [objToRow(c)], valueInputOption: 'USER_ENTERED'
+    });
+    const i=customers.findIndex(x=>x.id===c.id); if(i>-1) customers[i]=c;
+    return true;
+  } catch(e) { return false; }
+}
+
+async function deleteFromSheet(id) {
+  if (isDemoMode) { customers=customers.filter(x=>x.id!==id); return true; }
+  try {
+    const r = await SHEETS(`/values/${SHEET_TAB}!A:A`);
+    if (!r.values) return false;
+    const rowIndex = r.values.findIndex(v => v[0] === id);
+    if (rowIndex < 0) return false;
+    // Get sheet gid first
+    const meta = await SHEETS('');
+    const sheet = meta.sheets?.find(s => s.properties.title === SHEET_TAB);
+    if (!sheet) return false;
+    await SHEETS('/batchUpdate','POST',{
+      requests:[{ deleteDimension:{ range:{ sheetId:sheet.properties.sheetId, dimension:'ROWS', startIndex:rowIndex, endIndex:rowIndex+1 }}}]
+    });
+    customers=customers.filter(x=>x.id!==id);
+    return true;
+  } catch(e) { return false; }
+}
+
+async function markSentInSheet(id) {
+  const i=customers.findIndex(x=>x.id===id); if(i<0) return;
+  customers[i].reminderSent=true; customers[i].lastSent=new Date().toISOString();
+  if (!isDemoMode) await updateInSheet(customers[i]);
+}
+
+// ── DATA HELPERS ──────────────────────────────────────────
+function rowToObj(r) {
+  return {
+    id:r[0]||'', name:r[1]||'', phone:r[2]||'', mobileModel:r[3]||'',
+    bike:r[4]||'', bikeNum:r[5]||'', oilDate:r[6]||'', km:parseInt(r[7])||0,
+    oil:r[8]||'', reminderDate:r[9]||remOf(r[6]||''), reminderSent:r[10]==='TRUE'||r[10]===true,
+    lastSent:r[11]||'', addedBy:r[12]||'', createdAt:r[13]||''
+  };
+}
+function objToRow(c) {
+  return [c.id,c.name,c.phone,c.mobileModel||'',c.bike,c.bikeNum||'',c.oilDate,
+    c.km,c.oil||'',c.reminderDate,c.reminderSent?'TRUE':'FALSE',
+    c.lastSent||'',c.addedBy||'',c.createdAt||new Date().toISOString()];
+}
+function remOf(od) { if(!od) return ''; const d=new Date(od+'T00:00:00'); d.setMonth(d.getMonth()+3); return d.toISOString().split('T')[0]; }
+function today() { return new Date().toISOString().split('T')[0]; }
+function parseD(s) { return new Date(s+'T00:00:00'); }
+function diffD(a,b) { return Math.round((b-a)/86400000); }
+function fmtD(s) { return s ? parseD(s).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'; }
+function ini(n) { return n.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+const AVC=['linear-gradient(135deg,#f97316,#c2410c)','linear-gradient(135deg,#3b82f6,#1d4ed8)','linear-gradient(135deg,#8b5cf6,#6d28d9)','linear-gradient(135deg,#22c55e,#15803d)','linear-gradient(135deg,#ec4899,#be185d)','linear-gradient(135deg,#0ea5e9,#0369a1)'];
+function avc(n) { let h=0; for(let c of (n||'X')) h=(h<<5)-h+c.charCodeAt(0); return AVC[Math.abs(h)%AVC.length]; }
+function getStatus(rd) {
+  const now=new Date(); now.setHours(0,0,0,0);
+  const d=diffD(now,parseD(rd));
+  if(d<0) return {lbl:'OVERDUE',cls:'tr',card:'ov',days:Math.abs(d)};
+  if(d<=7) return {lbl:'DUE SOON',cls:'ty',card:'ds',days:d};
+  return {lbl:'OK',cls:'tg',card:'ok',days:d};
+}
+
+// ── APP INIT ──────────────────────────────────────────────
+async function loadApp() {
+  const saved = localStorage.getItem('sm_user');
+  if (!isDemoMode && saved) try { userInfo = JSON.parse(saved); } catch(e){}
+  showSplash(isDemoMode ? 'Loading demo data...' : 'Loading your customers...');
+  updateSplash('',80);
+  if (!isDemoMode) await fetchFromSheet();
+  updateSplash('',100);
+  setTimeout(() => {
+    hideSplash();
+    showApp();
+  }, 400);
+}
+
+function showApp() {
+  showScreen(null);
+  document.getElementById('app').classList.remove('hide');
+  // Set user info
+  const nm = userInfo.name || 'Employee';
+  document.getElementById('user-name-lbl').textContent = nm.split(' ')[0];
+  document.getElementById('set-uname').textContent = nm;
+  document.getElementById('set-uemail').textContent = userInfo.email || (isDemoMode ? 'Demo Mode' : '—');
+  if (userInfo.picture) {
+    const img = document.getElementById('user-av-img');
+    img.src = userInfo.picture; img.classList.remove('hide');
+    document.getElementById('user-av-fb').classList.add('hide');
+  } else {
+    document.getElementById('user-av-fb').textContent = ini(nm);
+  }
+  document.getElementById('set-sid').textContent = isDemoMode ? 'Demo Mode' : (sheetId||'Not set');
+  document.getElementById('f-dt').value = today();
+  document.getElementById('h-date').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('h-emp').textContent = `👤 ${nm} · ${isDemoMode?'Demo Mode':'Live Google Sheet'}`;
+  setSyncState(isDemoMode ? 'live' : (accessToken ? 'live' : 'offline'));
+  renderHome();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────
+function nav(id) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.querySelector(`.nb[data-p="${id}"]`)?.classList.add('active');
+  if(id==='customers') renderList();
+  if(id==='reminders') renderRem();
+  if(id==='home') renderHome();
+  if(id==='add' && !document.getElementById('eid').value) resetForm();
+}
+
+// ── SYNC ──────────────────────────────────────────────────
+async function syncNow() {
+  if (isDemoMode) { toast('Demo mode – no real sync',''); return; }
+  setSyncState('loading');
+  await fetchFromSheet();
+  renderHome(); renderList(); renderRem();
+  toast('✅ Synced!','ok');
+}
+
+function setSyncState(s) {
+  const dot=document.getElementById('sdot'), lbl=document.getElementById('slbl'), btn=document.getElementById('sync-btn');
+  if(s==='loading'){ dot.className='sdot loading'; lbl.textContent='Syncing...'; }
+  else if(s==='live'){ dot.className='sdot live'; lbl.textContent='Live'; }
+  else { dot.className='sdot off'; lbl.textContent='Offline'; }
+}
+
+// ── HOME ──────────────────────────────────────────────────
+function renderHome() {
+  const now=new Date(); now.setHours(0,0,0,0);
+  const ov=customers.filter(c=>diffD(now,parseD(c.reminderDate||remOf(c.oilDate)))<0).length;
+  const soon=customers.filter(c=>{const d=diffD(now,parseD(c.reminderDate||remOf(c.oilDate)));return d>=0&&d<=7;}).length;
+  document.getElementById('s-t').textContent=customers.length;
+  document.getElementById('s-o').textContent=ov;
+  document.getElementById('s-s').textContent=soon;
+  const urg=ov+soon, rb=document.getElementById('rbadge');
+  urg>0?(rb.textContent=urg,rb.classList.remove('hide')):rb.classList.add('hide');
+  const list=customers
+    .filter(c=>{const d=diffD(now,parseD(c.reminderDate||remOf(c.oilDate)));return d>=-60&&d<=7;})
+    .sort((a,b)=>parseD(a.reminderDate||remOf(a.oilDate))-parseD(b.reminderDate||remOf(b.oilDate)))
+    .slice(0,6);
+  const el=document.getElementById('home-rem');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">✅</div><h3>All Clear!</h3><p>No reminders due soon</p></div>';return;}
+  el.innerHTML=list.map(buildRC).join('');
+}
+
+function buildRC(c) {
+  const rd=c.reminderDate||remOf(c.oilDate);
+  const now=new Date(); now.setHours(0,0,0,0);
+  const d=diffD(now,parseD(rd));
+  const due=d<0?`<span style="color:var(--red)">🔴 ${Math.abs(d)}d overdue</span>`:d===0?`<span style="color:var(--ylw)">🟡 Due Today</span>`:`<span style="color:var(--ylw)">🟡 ${d}d · ${fmtD(rd)}</span>`;
+  return `<div class="rc ${d<0?'urg':''} ${c.reminderSent?'sent':''}" onclick="openModal('${c.id}')">
+    <div class="ava" style="width:38px;height:38px;background:${avc(c.name)};font-size:14px">${ini(c.name)}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:600;font-size:13px">${c.name}</div>
+      <div style="font-size:11px;color:var(--t2)">${c.bike} · ${c.phone}</div>
+      <div style="font-size:11px;margin-top:3px">${due}</div>
+    </div>
+    <button class="wab" onclick="event.stopPropagation();waD('${c.id}')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </button>
+  </div>`;
+}
+
+// ── ADD / EDIT ────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('eid').value='';
+  document.getElementById('ftitle').textContent='Add New Customer';
+  document.getElementById('savetxt').textContent='Save to Google Sheet';
+  ['f-nm','f-ph','f-mm','f-bk','f-km','f-bn','f-ol'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('f-dt').value=today();
+}
+async function saveCust() {
+  const nm=document.getElementById('f-nm').value.trim();
+  const ph=document.getElementById('f-ph').value.trim();
+  const bk=document.getElementById('f-bk').value.trim();
+  const dt=document.getElementById('f-dt').value;
+  const km=document.getElementById('f-km').value.trim();
+  if(!nm){toast('⚠️ Name required','er');return;}
+  if(!ph||ph.length<10){toast('⚠️ Valid phone required','er');return;}
+  if(!bk){toast('⚠️ Bike model required','er');return;}
+  if(!dt){toast('⚠️ Date required','er');return;}
+  if(!km){toast('⚠️ Running KM required','er');return;}
+  const btn=document.getElementById('savebtn');
+  btn.disabled=true; btn.innerHTML='<div class="lspinner" style="width:18px;height:18px;border-width:2px"></div> Saving...';
+  const eid=document.getElementById('eid').value;
+  const obj={
+    id: eid||Date.now().toString(), name:nm, phone:ph,
+    mobileModel: document.getElementById('f-mm').value.trim(),
+    bike:bk, bikeNum: document.getElementById('f-bn').value.trim().toUpperCase(),
+    oilDate:dt, km:parseInt(km),
+    oil: document.getElementById('f-ol').value.trim(),
+    reminderDate:remOf(dt), reminderSent:false,
+    addedBy: userInfo.name||'Employee',
+    createdAt: eid?(customers.find(x=>x.id===eid)?.createdAt||new Date().toISOString()):new Date().toISOString()
+  };
+  const ok = eid ? await updateInSheet(obj) : await appendToSheet(obj);
+  if(ok){ toast(eid?'✅ Updated!':'✅ Saved to Google Sheet!','ok'); resetForm(); renderHome(); setTimeout(()=>nav('customers'),400); }
+  else toast('❌ Save failed. Check internet.','er');
+  btn.disabled=false; btn.innerHTML='<span>💾</span><span id="savetxt">Save to Google Sheet</span>';
+}
+
+// ── LIST ──────────────────────────────────────────────────
+function renderList() {
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const f=customers.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q)||(c.bike||'').toLowerCase().includes(q));
+  const el=document.getElementById('clist');
+  if(!f.length){el.innerHTML='<div class="empty"><div class="ei">🔍</div><h3>No customers found</h3></div>';return;}
+  el.innerHTML=f.map(c=>{
+    const rd=c.reminderDate||remOf(c.oilDate), st=getStatus(rd);
+    return `<div class="cc ${st.card}" onclick="openModal('${c.id}')">
+      <div class="ava" style="width:42px;height:42px;background:${avc(c.name)};font-size:16px">${ini(c.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px">${c.name}</div>
+        <div style="font-size:11px;color:var(--t2)">📱 ${c.phone} · 🏍️ ${c.bike}</div>
+        <div style="font-size:11px;color:var(--t2)">🔧 ${fmtD(c.oilDate)} · ${parseInt(c.km).toLocaleString()} KM${c.addedBy?` · 👤 ${c.addedBy}`:''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+        <span class="tag ${st.cls}">${st.lbl}</span>
+        <button class="wab" style="padding:6px 8px;font-size:14px" onclick="event.stopPropagation();waD('${c.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── REMINDERS ─────────────────────────────────────────────
+function setF(el,f){document.querySelectorAll('.fc').forEach(c=>c.classList.remove('active'));el.classList.add('active');remF=f;renderRem();}
+function renderRem() {
+  const now=new Date(); now.setHours(0,0,0,0);
+  let list=[...customers];
+  if(remF==='today') list=list.filter(c=>diffD(now,parseD(c.reminderDate||remOf(c.oilDate)))===0);
+  else if(remF==='week') list=list.filter(c=>{const d=diffD(now,parseD(c.reminderDate||remOf(c.oilDate)));return d>=0&&d<=7;});
+  else if(remF==='overdue') list=list.filter(c=>diffD(now,parseD(c.reminderDate||remOf(c.oilDate)))<0);
+  else if(remF==='sent') list=list.filter(c=>c.reminderSent);
+  else list=list.filter(c=>diffD(now,parseD(c.reminderDate||remOf(c.oilDate)))<=30);
+  list.sort((a,b)=>parseD(a.reminderDate||remOf(a.oilDate))-parseD(b.reminderDate||remOf(b.oilDate)));
+  const el=document.getElementById('rlist');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">🔔</div><h3>No reminders here</h3></div>';return;}
+  el.innerHTML=list.map(buildRC).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function openModal(id) {
+  selId=id;
+  const c=customers.find(x=>x.id===id); if(!c) return;
+  const rd=c.reminderDate||remOf(c.oilDate), st=getStatus(rd);
+  document.getElementById('m-av').textContent=ini(c.name);
+  document.getElementById('m-av').style.background=avc(c.name);
+  document.getElementById('m-nm').textContent=c.name;
+  document.getElementById('m-info').innerHTML=`📱 ${c.phone}${c.addedBy?` · 👤 ${c.addedBy}`:''}`;
+  document.getElementById('m-grid').innerHTML=`
+    <div class="mf"><div class="ml">Bike</div><div class="mv">🏍️ ${c.bike}</div></div>
+    <div class="mf"><div class="ml">Oil Changed</div><div class="mv">📅 ${fmtD(c.oilDate)}</div></div>
+    <div class="mf"><div class="ml">Running KM</div><div class="mv">⚙️ ${parseInt(c.km).toLocaleString()}</div></div>
+    <div class="mf"><div class="ml">Due Date</div><div class="mv" style="color:${st.card==='ov'?'var(--red)':st.card==='ds'?'var(--ylw)':'var(--grn)'}">${fmtD(rd)}</div></div>
+    ${c.bikeNum?`<div class="mf"><div class="ml">Bike No.</div><div class="mv">🪪 ${c.bikeNum}</div></div>`:''}
+    ${c.oil?`<div class="mf"><div class="ml">Oil Brand</div><div class="mv">🛢️ ${c.oil}</div></div>`:''}
+    <div class="mf"><div class="ml">Status</div><div class="mv"><span class="tag ${st.cls}">${st.lbl}</span></div></div>
+    <div class="mf"><div class="ml">Reminder</div><div class="mv" style="font-size:12px">${c.reminderSent?'✅ Sent':'⏳ Pending'}</div></div>
+  `;
+  document.getElementById('dmodal').classList.add('open');
+}
+function cm(){document.getElementById('dmodal').classList.remove('open');}
+function cmOut(e){if(e.target.id==='dmodal')cm();}
+
+async function sendWA(){waD(selId);}
+async function waD(id) {
+  const c=customers.find(x=>x.id===id); if(!c) return;
+  const ph=c.phone.replace(/\D/g,''), wp=ph.startsWith('91')?ph:'91'+ph;
+  const msg=`Hello ${c.name},\n\nThis is a reminder from *Sudarshan Motors* 🛢️\n\nYour last engine oil change was on *${fmtD(c.oilDate)}* when your bike's running KM was *${parseInt(c.km).toLocaleString()} KM*.\n\nNow *3 months* have passed. It may be the right time to change your engine oil again! 🏍️\n\nTimely oil changes keep your *${c.bike}* engine healthy and running smoothly.\n\nPlease visit us at your convenience.\n\n📍 *Sudarshan Motors*\nGandhinagar Main Road\n📞 *7978752806*\n\nThank you for trusting us! 🙏`;
+  window.open(`https://wa.me/${wp}?text=${encodeURIComponent(msg)}`,'_blank');
+  await markSentInSheet(id);
+  toast('📤 Opening WhatsApp...','ok');
+  cm(); renderHome();
+}
+
+async function editC() {
+  const c=customers.find(x=>x.id===selId); if(!c) return;
+  cm();
+  document.getElementById('eid').value=c.id;
+  document.getElementById('ftitle').textContent='Edit Customer';
+  document.getElementById('savetxt').textContent='Update Google Sheet';
+  document.getElementById('f-nm').value=c.name;
+  document.getElementById('f-ph').value=c.phone;
+  document.getElementById('f-mm').value=c.mobileModel||'';
+  document.getElementById('f-bk').value=c.bike;
+  document.getElementById('f-dt').value=c.oilDate;
+  document.getElementById('f-km').value=c.km;
+  document.getElementById('f-bn').value=c.bikeNum||'';
+  document.getElementById('f-ol').value=c.oil||'';
+  nav('add');
+}
+async function delC() {
+  const c=customers.find(x=>x.id===selId);
+  if(!confirm(`Delete ${c?.name}? This removes them from Google Sheet too.`)) return;
+  showLoader('Deleting...');
+  const ok=await deleteFromSheet(selId);
+  hideLoader();
+  if(ok) toast('🗑️ Deleted','');
+  else toast('❌ Delete failed','er');
+  cm(); renderList(); renderHome();
+}
+
+// ── EXPORT ────────────────────────────────────────────────
+function exportCSV() {
+  if(!customers.length){toast('No data to export','er');return;}
+  const h=['Name','Phone','Mobile Model','Bike Model','Bike No','Oil Date','KM','Oil Brand','Reminder Date','Status','Sent','Added By'];
+  const rows=customers.map(c=>{const st=getStatus(c.reminderDate||remOf(c.oilDate));return[c.name,c.phone,c.mobileModel||'',c.bike,c.bikeNum||'',c.oilDate,c.km,c.oil||'',c.reminderDate||remOf(c.oilDate),st.lbl,c.reminderSent?'Yes':'No',c.addedBy||''];});
+  const csv=[h,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='sudarshan_motors.csv';a.click();
+  toast('📊 CSV exported!','ok');
+}
+function openGSheet() {
+  if(!sheetId){toast('No sheet connected','er');return;}
+  window.open(`https://docs.google.com/spreadsheets/d/${sheetId}/edit`,'_blank');
+}
+
+// ── SIGN OUT ──────────────────────────────────────────────
+function signOut() {
+  if(!confirm('Sign out?')) return;
+  localStorage.removeItem('sm_user');
+  accessToken=''; userInfo={}; customers=[];
+  document.getElementById('app').classList.add('hide');
+  showScreen('s-login');
+}
+function showUserMenu() {
+  if(confirm(`Signed in as: ${userInfo.name||'—'}\n${userInfo.email||''}\n\nSign out?`)) signOut();
+}
+
+// ── SPLASH HELPERS ────────────────────────────────────────
+function showSplash(msg) {
+  showScreen('s-splash');
+  document.getElementById('splash-msg').textContent=msg||'Loading...';
+  document.getElementById('splash-fill').style.width='20%';
+}
+function updateSplash(msg,pct) {
+  if(msg) document.getElementById('splash-msg').textContent=msg;
+  if(pct) document.getElementById('splash-fill').style.width=pct+'%';
+}
+function hideSplash() { document.getElementById('s-splash').classList.add('hide'); }
+function showScreen(id) {
+  ['s-login','s-splash','s-sheetid'].forEach(s=>document.getElementById(s).classList.add('hide'));
+  if(id) document.getElementById(id).classList.remove('hide');
+}
+function showLoader(m){document.getElementById('loader').classList.add('show');document.getElementById('lmsg').textContent=m||'Loading...';}
+function hideLoader(){document.getElementById('loader').classList.remove('show');}
+function toast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',2800);
+}
+
+// ── CONFIG NOTICE (no CLIENT_ID set) ─────────────────────
+function showConfigNotice() {
+  document.getElementById('s-login').innerHTML += `
+    <div style="width:100%;max-width:360px;margin-top:20px">
+      <div style="background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);border-radius:14px;padding:18px;font-size:13px;color:#fdba74;line-height:1.7">
+        <b style="font-size:15px;color:var(--acc)">⚙️ One-Time Developer Setup Needed</b><br><br>
+        To enable real Google login, a <b>Google OAuth Client ID</b> is needed (free):<br><br>
+        1. Go to <b>console.cloud.google.com</b><br>
+        2. Create a project → Enable <b>Google Sheets API</b><br>
+        3. Go to <b>APIs & Services → Credentials</b><br>
+        4. Create <b>OAuth 2.0 Client ID</b> (Web application)<br>
+        5. Add your domain to Authorized Origins<br>
+        6. Copy the Client ID and replace <b>YOUR_GOOGLE_CLIENT_ID</b> in the HTML file<br><br>
+        <b>Or use Demo Mode to try the app right now ↓</b>
+      </div>
+    </div>`;
+}
+
+// ── AUTO-LOGIN (if previously logged in) ─────────────────
+window.addEventListener('load', () => {
+  // Try to restore session from localStorage
+  const saved = localStorage.getItem('sm_user');
+  sheetId = localStorage.getItem('sm_sheet_id') || '';
+  if (saved && sheetId) {
+    try {
+      userInfo = JSON.parse(saved);
+      // Note: access token expires — user needs to re-auth for writes
+      // Show app with cached data first, re-auth silently if possible
+      isDemoMode = false;
+      loadApp();
+      return;
+    } catch(e) {}
+  }
+  showScreen('s-login');
+});
+</script>
+</body>
+</html>
