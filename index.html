@@ -261,24 +261,29 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;colo
   <div class="login-card">
     <h2>Who is using the app?</h2>
 
-    <!-- Employee selector — edit names here -->
-    <div class="emp-btns" id="emp-btns">
-      <div class="emp-btn" onclick="selectEmp(this,'Owner','👑')">
+    <!-- Employee selector -->
+    <div class="emp-btns" id="emp-btns" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="emp-btn" onclick="selectEmp(this,'Tipun')">
         <div class="eb-icon">👑</div>
-        <div class="eb-name">Owner</div>
-        <div class="eb-role">Full access</div>
+        <div class="eb-name">Tipun</div>
+        <div class="eb-role">Owner</div>
       </div>
-      <div class="emp-btn" onclick="selectEmp(this,'Raju','👨‍🔧')">
+      <div class="emp-btn" onclick="selectEmp(this,'Papun')">
         <div class="eb-icon">👨‍🔧</div>
-        <div class="eb-name">Raju</div>
+        <div class="eb-name">Papun</div>
         <div class="eb-role">Employee</div>
       </div>
-      <div class="emp-btn" onclick="selectEmp(this,'Suresh','👨‍🔧')">
+      <div class="emp-btn" onclick="selectEmp(this,'Chintu')">
         <div class="eb-icon">👨‍🔧</div>
-        <div class="eb-name">Suresh</div>
+        <div class="eb-name">Chintu</div>
         <div class="eb-role">Employee</div>
       </div>
-      <div class="emp-btn" onclick="selectEmp(this,'Other','👤')">
+      <div class="emp-btn" onclick="selectEmp(this,'Balram')">
+        <div class="eb-icon">👨‍🔧</div>
+        <div class="eb-name">Balram</div>
+        <div class="eb-role">Employee</div>
+      </div>
+      <div class="emp-btn" onclick="selectEmp(this,'Other')">
         <div class="eb-icon">👤</div>
         <div class="eb-name">Other</div>
         <div class="eb-role">Employee</div>
@@ -359,10 +364,7 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;colo
         <input type="hidden" id="eid">
         <div class="fld"><label>Customer Name *</label><input type="text" id="f-nm" placeholder="e.g. Ramesh Kumar" autocomplete="off"></div>
         <div class="fld"><label>Mobile Number *</label><input type="tel" id="f-ph" placeholder="10-digit number" maxlength="15"></div>
-        <div class="fr">
-          <div class="fld"><label>Mobile Model</label><input type="text" id="f-mm" placeholder="Samsung M32"></div>
-          <div class="fld"><label>Bike Model *</label><input type="text" id="f-bk" placeholder="Honda Shine"></div>
-        </div>
+        <div class="fld"><label>Bike Model *</label><input type="text" id="f-bk" placeholder="e.g. Honda Shine, Hero Splendor"></div>
         <div class="fr">
           <div class="fld"><label>Oil Change Date *</label><input type="date" id="f-dt"></div>
           <div class="fld"><label>Running KM *</label><input type="number" id="f-km" placeholder="15200"></div>
@@ -479,7 +481,7 @@ let selId      = null;
 let remF       = 'all';
 
 // ── LOGIN ──────────────────────────────────────────────
-function selectEmp(el, name, icon) {
+function selectEmp(el, name) {
   document.querySelectorAll('.emp-btn').forEach(b => b.classList.remove('selected'));
   el.classList.add('selected');
   currentEmp = name;
@@ -682,7 +684,7 @@ function resetForm(){
   document.getElementById('eid').value='';
   document.getElementById('ftitle').textContent='Add New Customer';
   document.getElementById('savetxt').textContent='Save to Google Sheet';
-  ['f-nm','f-ph','f-mm','f-bk','f-km','f-bn','f-ol'].forEach(i=>document.getElementById(i).value='');
+  ['f-nm','f-ph','f-bk','f-km','f-bn','f-ol'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('f-dt').value=today();
 }
 
@@ -702,7 +704,7 @@ async function saveCust(){
   const eid=document.getElementById('eid').value;
   const obj={
     id:eid||Date.now().toString(),name:nm,phone:ph,
-    mobileModel:document.getElementById('f-mm').value.trim(),
+    mobileModel:'',
     bike:bk,bikeNum:document.getElementById('f-bn').value.trim().toUpperCase(),
     oilDate:dt,km:parseInt(km),
     oil:document.getElementById('f-ol').value.trim(),
@@ -714,9 +716,21 @@ async function saveCust(){
   if(r.ok){
     if(eid){const i=customers.findIndex(x=>x.id===eid);if(i>-1)customers[i]=obj;}
     else customers.unshift(obj);
-    toast(eid?'✅ Updated!':'✅ Saved to Google Sheet!','ok');
-    resetForm();renderHome();setTimeout(()=>nav('customers'),400);
-  } else toast('❌ Save failed. Check internet.','er');
+    btn.style.background='linear-gradient(135deg,#22c55e,#15803d)';
+    btn.innerHTML='<span>✅</span><span>Saved Successfully!</span>';
+    toast(eid?'✅ Customer updated!':'✅ Saved to Google Sheet!','ok');
+    resetForm();
+    renderHome();
+    setTimeout(()=>{
+      btn.style.background='';
+      btn.disabled=false;
+      btn.innerHTML='<span>💾</span><span id="savetxt">Save to Google Sheet</span>';
+      nav('customers');
+    },1500);
+    return;
+  } else {
+    toast('❌ Save failed. Check internet.','er');
+  }
   btn.disabled=false;btn.innerHTML='<span>💾</span><span id="savetxt">Save to Google Sheet</span>';
 }
 
@@ -802,7 +816,6 @@ async function editC(){
   document.getElementById('savetxt').textContent='Update Google Sheet';
   document.getElementById('f-nm').value=c.name;
   document.getElementById('f-ph').value=c.phone;
-  document.getElementById('f-mm').value=c.mobileModel||'';
   document.getElementById('f-bk').value=c.bike;
   document.getElementById('f-dt').value=c.oilDate;
   document.getElementById('f-km').value=c.km;
