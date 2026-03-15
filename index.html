@@ -414,7 +414,7 @@ html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;colo
 //  Get it free at: console.cloud.google.com
 //  (Create project → Enable Sheets API → OAuth 2.0 Client ID)
 // ══════════════════════════════════════════════════════════
-const CLIENT_ID = '687936364206-6idri2cbljl9oqj9j2h41rn4ngnminq0.apps.googleusercontent.com.apps.googleusercontent.com';
+const CLIENT_ID = '687936364206-6idri2cbljl9oqj9j2h41rn4ngnminq0.apps.googleusercontent.com';
 // Sheet name tab inside Google Sheets
 const SHEET_TAB = 'Customers';
 const HEADERS   = ['ID','Name','Phone','Mobile Model','Bike Model','Bike Number',
@@ -432,7 +432,7 @@ let isDemoMode  = false;
 
 // ── GOOGLE AUTH ───────────────────────────────────────────
 function signInWithGoogle() {
-  if (CLIENT_ID === '687936364206-6idri2cbljl9oqj9j2h41rn4ngnminq0.apps.googleusercontent.com.apps.googleusercontent.com') {
+  if (CLIENT_ID === '687936364206-6idri2cbljl9oqj9j2h41rn4ngnminq0.apps.googleusercontent.com') {
     // No client ID configured — show instruction
     showConfigNotice(); return;
   }
