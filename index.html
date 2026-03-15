@@ -539,39 +539,53 @@ function launchApp() {
 }
 
 // ── API ─────────────────────────────────────────────────
+// Apps Script requires GET for reading, POST (text/plain) for writing
 async function api(action, data={}) {
   try {
-    // Use no-cors POST then GET fallback for Apps Script
-    const payload = JSON.stringify({action, ...data});
-    // Try POST first
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'text/plain'}, // text/plain avoids CORS preflight
-      body: payload,
-      redirect: 'follow'
-    });
-    const txt = await res.text();
-    try { return JSON.parse(txt); }
-    catch(e) { return {ok:false, error:'Bad response: '+txt.slice(0,100)}; }
-  } catch(e) {
-    // Fallback: GET with params (for simple reads)
-    try {
-      const params = new URLSearchParams({action});
-      const res2 = await fetch(`${SCRIPT_URL}?${params}`, {redirect:'follow'});
-      const txt2 = await res2.text();
-      return JSON.parse(txt2);
-    } catch(e2) {
-      setSyncState('off');
-      return {ok:false, error: e2.toString()};
+    if (action === 'getAll') {
+      // GET request for reading data — Apps Script handles this via doGet
+      const url = `${SCRIPT_URL}?action=getAll&t=${Date.now()}`;
+      const res = await fetch(url, { redirect: 'follow' });
+      const txt = await res.text();
+      try { return JSON.parse(txt); }
+      catch(e) { return {ok:false, error:'Parse error: '+txt.slice(0,200)}; }
+    } else {
+      // POST request for writing — use text/plain to avoid CORS preflight
+      const payload = JSON.stringify({action, ...data});
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: payload,
+        redirect: 'follow'
+      });
+      const txt = await res.text();
+      try { return JSON.parse(txt); }
+      catch(e) { return {ok:false, error:'Parse error: '+txt.slice(0,200)}; }
     }
+  } catch(e) {
+    setSyncState('off');
+    console.error('API error:', e);
+    return {ok:false, error: e.toString()};
   }
 }
 
 async function fetchData() {
   setSyncState('syncing');
-  const r = await api('getAll');
-  if (r.ok) { customers = r.customers || []; setSyncState('live'); }
-  else { setSyncState('off'); }
+  try {
+    const r = await api('getAll');
+    if (r.ok) {
+      customers = r.customers || [];
+      setSyncState('live');
+      console.log('Loaded', customers.length, 'customers from sheet');
+    } else {
+      setSyncState('off');
+      console.error('fetchData error:', r.error);
+      toast('⚠️ Could not load sheet: ' + (r.error||'unknown'), 'er');
+    }
+  } catch(e) {
+    setSyncState('off');
+    toast('⚠️ Network error loading data', 'er');
+  }
 }
 
 async function syncNow() {
